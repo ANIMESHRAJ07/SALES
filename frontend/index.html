@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sales App</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        input {
+            padding: 8px;
+            margin: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background: #f1f1f1;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            margin-bottom: 10px;
+            color: #444;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🛍 Sales App</h1>
+
+    <div class="card">
+        <h2 class="section-title">Add Product</h2>
+        <input id="name" placeholder="Name">
+        <input id="description" placeholder="Description">
+        <input id="price" placeholder="Price" type="number">
+        <input id="stock" placeholder="Stock" type="number">
+        <button onclick="createProduct()">Create</button>
+    </div>
+
+    <div class="card">
+        <h2 class="section-title">Products</h2>
+        <button onclick="loadProducts()">Load Products</button>
+        <ul id="productList"></ul>
+    </div>
+
+    <div class="card">
+        <h2 class="section-title">Cart</h2>
+        <button onclick="loadCart()">View Cart</button>
+        <ul id="cartList"></ul>
+    </div>
+
+</div>
+
+<script>
+
+const API = "http://127.0.0.1:8000";
+
+async function createProduct() {
+    const data = {
+        name: document.getElementById("name").value,
+        description: document.getElementById("description").value,
+        price: parseFloat(document.getElementById("price").value),
+        stock: parseInt(document.getElementById("stock").value)
+    };
+
+    await fetch(API + "/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+
+    alert("Product Created!");
+}
+
+async function loadProducts() {
+    const res = await fetch(API + "/products");
+    const products = await res.json();
+
+    const list = document.getElementById("productList");
+    list.innerHTML = "";
+
+    products.forEach(p => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+            <span>${p.name} - ₹${p.price}</span>
+            <button onclick="addToCart(${p.id})">Add</button>
+        `;
+        list.appendChild(li);
+    });
+}
+
+async function addToCart(productId) {
+    await fetch(API + "/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            product_id: productId,
+            quantity: 1
+        })
+    });
+
+    alert("Added to Cart!");
+}
+
+async function loadCart() {
+    const res = await fetch(API + "/cart");
+    const cart = await res.json();
+
+    const list = document.getElementById("cartList");
+    list.innerHTML = "";
+
+    cart.forEach(item => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+            Product ID: ${item.product_id} | Quantity: ${item.quantity}
+        `;
+        list.appendChild(li);
+    });
+}
+
+</script>
+
+</body>
+</html>
