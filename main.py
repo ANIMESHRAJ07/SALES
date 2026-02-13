@@ -38,7 +38,7 @@ def get_db():
 
 @app.get("/")
 def root():
-    return {"message": "Sales Backend Running 🚀"}
+    return {"message": "Sales Backend Running "}
 
 @app.post("/products", response_model=schemas.ProductResponse)
 def create_product(product: schemas.ProductCreate, db: Session = Depends(get_db)):
