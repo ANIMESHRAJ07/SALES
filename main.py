@@ -4,6 +4,13 @@ from sqlalchemy.orm import Session
 import models
 import schemas
 from database import engine, SessionLocal, Base
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
+
 
 app = FastAPI()
 
